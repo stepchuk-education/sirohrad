@@ -1,0 +1,102 @@
+<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><style>*{box-sizing:border-box}[hidden]{display:none!important}img{max-width:100%}</style><title>SIROHRAD Запуск</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700;800&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+/* Layout: one centered terminal panel — code slots, input, then the unlocked trailer link. Single dark look, committed. */
+:root{
+  --bg:#0b1416; --surface:#111c1f; --panel:#1a282c; --line:#2c3f44;
+  --muted:#8fa4a8; --ink:#eceef2; --neon:#2ff0c9; --acid:#e6ff3d; --glitch:#ff3d7f;
+  --display:"Unbounded","Arial Black",sans-serif; --mono:"JetBrains Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--ink);height:100%}
+body{font-family:var(--mono);font-size:15px;line-height:1.5;display:flex;align-items:center;justify-content:center;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px;
+  background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 4px)}
+.panel{position:relative;width:100%;max-width:560px;background:var(--surface);border:1px solid var(--line);padding:28px 22px;display:flex;flex-direction:column;gap:20px;text-align:center}
+.panel::before,.panel::after{content:"";position:absolute;width:20px;height:20px;border:2px solid var(--neon)}
+.panel::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+.panel::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+.panel.ok::before,.panel.ok::after{border-color:var(--acid)}
+.lab{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.lab.g{color:var(--glitch)}.lab.n{color:var(--neon)}.lab.a{color:var(--acid)}
+.logo{font-family:var(--display);font-weight:800;font-size:clamp(34px,10vw,52px);line-height:1;position:relative;display:inline-block;margin:0 auto}
+.logo span{position:absolute;left:3px;top:0;color:var(--neon);clip-path:inset(55% 0 18% 0)}
+.logo span+span{left:-3px;color:var(--glitch);clip-path:inset(20% 0 62% 0)}
+.slots{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-width:400px;margin:0 auto;width:100%}
+.slot{aspect-ratio:4/5;max-width:100%;display:grid;place-items:center;font:800 clamp(26px,8vw,40px) var(--display);border:2px dashed var(--line);color:var(--line);border-radius:2px}
+.slot.on{border:2px solid var(--acid);background:var(--acid);color:var(--bg);box-shadow:0 0 24px rgba(230,255,61,.35)}
+form{display:flex;flex-direction:column;gap:10px;max-width:400px;margin:0 auto;width:100%}
+input{font:700 22px var(--mono);letter-spacing:.3em;text-align:center;text-transform:uppercase;background:var(--bg);color:var(--ink);border:1px solid var(--line);padding:14px 10px;width:100%}
+input:focus{outline:2px solid var(--neon);outline-offset:0}
+.btn{font:700 15px var(--mono);letter-spacing:.12em;text-transform:uppercase;background:var(--acid);color:var(--bg);border:0;padding:16px;cursor:pointer;text-decoration:none;display:block}
+.btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.msg{min-height:22px;font-size:13px}
+.msg.err{color:var(--glitch)}
+.shake{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-6px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+h1{font-family:var(--display);font-size:clamp(26px,7vw,34px);line-height:1.1;margin:0;text-wrap:balance}
+.note{color:var(--muted);font-size:13px;margin:0}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style></head><body>
+
+<main class="panel" id="panel">
+  <div class="lab g" id="status">SYS://LAUNCH · ДОСТУП ЗАКРИТО</div>
+  <div class="logo" aria-label="SIROHRAD">SIROHRAD<span aria-hidden="true">SIROHRAD</span><span aria-hidden="true">SIROHRAD</span></div>
+
+  <div class="slots" id="slots" aria-hidden="true"></div>
+
+  <section id="lock">
+    <form id="f" autocomplete="off">
+      <label class="lab" for="code">Введи код запуску, який зібрав твій клас</label>
+      <input id="code" name="code" maxlength="5" inputmode="text" autocapitalize="characters" spellcheck="false" placeholder="•••••">
+      <button class="btn" type="submit">Запустити гру</button>
+      <div class="msg" id="msg" role="status" aria-live="polite"></div>
+    </form>
+  </section>
+
+  <section id="open" hidden>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="lab a">ACHIEVEMENT UNLOCKED · ГРУ ЗАПУЩЕНО</div>
+      <h1>Ти автор цього світу</h1>
+      <a class="btn" id="watch" href="#" target="_blank" rel="noopener" hidden>Дивитись трейлер класу</a>
+      <p class="note" id="wait" hidden>Трейлер твого класу ще рендериться. Зазирни сюди ввечері, після уроку.</p>
+      <p class="note">Покажи трейлер батькам: тут твій герой і твій світ.</p>
+    </div>
+  </section>
+
+  <div class="lab">SIROHRAD · BETA · IT STEP ACADEMY BRATISLAVA</div>
+</main>
+
+<script>
+// Посилання на папку Google Drive кожного уроку (доступ «усі, хто має посилання → читач»).
+// Картка учня веде на цю сторінку з #l1 … #l5 — дитина бачить лише трейлер свого класу.
+const LESSONS = { l1: "", l2: "", l3: "", l4: "", l5: "" };
+const LESSON = (location.hash.match(/^#(l[1-5])$/) || [])[1] || null;
+const CODES = ["СТАРТ","АВТОР"];
+const LAT = {A:"А",B:"В",C:"С",E:"Е",H:"Н",K:"К",M:"М",O:"О",P:"Р",T:"Т",X:"Х",Y:"У"};
+const norm = s => s.toUpperCase().replace(/\s+/g,"").replace(/[A-Z]/g,c=>LAT[c]||c);
+const $ = id => document.getElementById(id);
+
+function drawSlots(word){ $("slots").innerHTML = [...Array(5)].map((_,i)=>{const ch=word?word[i]:"?";return `<div class="slot ${word?"on":""}">${ch}</div>`}).join(""); }
+drawSlots(null);
+if (!LESSON) { $("msg").textContent = "Відскануй QR зі своєї картки SIROHRAD, щоб відкрити трейлер свого класу."; }
+
+$("f").addEventListener("submit", e => {
+  e.preventDefault();
+  const v = norm($("code").value);
+  const hit = CODES.find(c => c === v);
+  if (!hit) {
+    $("msg").textContent = v.length < 5 ? "У коді 5 букв. Спитай у команди." : "ACCESS DENIED · Код не підходить. Спробуй ще раз.";
+    $("msg").className = "msg err";
+    $("panel").classList.remove("shake"); void $("panel").offsetWidth; $("panel").classList.add("shake");
+    return;
+  }
+  drawSlots(hit);
+  $("status").textContent = "SYS://LAUNCH · ДОСТУП ВІДКРИТО"; $("status").className = "lab a";
+  $("panel").classList.add("ok"); $("lock").hidden = true; $("open").hidden = false;
+  const url = LESSON ? LESSONS[LESSON] : "";
+  if (url) { $("watch").href = url; $("watch").hidden = false; } else { $("wait").hidden = false; }
+});
+</script>
+</body></html>

@@ -1,0 +1,199 @@
+<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><style>*{box-sizing:border-box}[hidden]{display:none!important}img{max-width:100%}</style><title>SIROHRAD Лутбокс</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700;800&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+/* Layout: one phone-first column — HUD bar, the crate, then the drop (biome + two role cards). Single dark look, committed. */
+:root{
+  --bg:#0b1416; --surface:#111c1f; --panel:#1a282c; --line:#2c3f44;
+  --muted:#8fa4a8; --ink:#eceef2; --neon:#2ff0c9; --acid:#e6ff3d; --glitch:#ff3d7f;
+  --display:"Unbounded","Arial Black",sans-serif;
+  --mono:"JetBrains Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--mono);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px;
+  background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 4px);min-height:100%}
+.wrap{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+.lab{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.lab.n{color:var(--neon)}.lab.g{color:var(--glitch)}
+
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-.01em;position:relative;line-height:1}
+.logo span{position:absolute;left:2px;top:0;color:var(--neon);clip-path:inset(55% 0 18% 0)}
+.mode{display:flex;border:1px solid var(--line)}
+.mode button{font:500 12px var(--mono);letter-spacing:.1em;background:none;color:var(--muted);border:0;padding:8px 12px;cursor:pointer}
+.mode button[aria-pressed="true"]{background:var(--neon);color:var(--bg)}
+button:focus-visible,a:focus-visible{outline:2px solid var(--acid);outline-offset:2px}
+
+.bar{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.bar i{height:6px;border:1px solid var(--line)}
+.bar i.on{background:var(--neon);border-color:var(--neon)}
+
+.stage{position:relative;background:var(--surface);border:1px solid var(--line);padding:24px 20px;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center}
+.stage::before,.stage::after{content:"";position:absolute;width:18px;height:18px;border:2px solid var(--neon)}
+.stage::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+.stage::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+h1{font-family:var(--display);font-weight:800;font-size:44px;line-height:1;margin:0;text-wrap:balance}
+
+/* crate */
+.crate{width:180px;height:150px;position:relative;margin:6px 0}
+.crate .lid{position:absolute;left:0;right:0;top:0;height:44px;background:var(--panel);border:2px solid var(--neon);transition:transform .5s cubic-bezier(.3,1.6,.5,1)}
+.crate .box{position:absolute;left:8px;right:8px;top:40px;bottom:0;background:var(--panel);border:2px solid var(--line);display:grid;place-items:center}
+.crate .box b{font-family:var(--display);font-size:44px;color:var(--line)}
+.crate .lid::after{content:"";position:absolute;left:50%;top:100%;width:26px;height:18px;margin-left:-13px;background:var(--acid)}
+.crate.shake{animation:shake .12s linear infinite}
+.crate.open .lid{transform:translateY(-38px) rotate(-12deg)}
+.crate.open .box{border-color:var(--acid);box-shadow:0 -10px 40px rgba(230,255,61,.35)}
+@keyframes shake{0%{transform:translate(0,0)}25%{transform:translate(-3px,1px)}50%{transform:translate(2px,-2px)}75%{transform:translate(-1px,2px)}100%{transform:translate(0,0)}}
+
+.reel{font-family:var(--display);font-weight:700;font-size:20px;min-height:28px;color:var(--muted)}
+.btn{font:700 15px var(--mono);letter-spacing:.12em;text-transform:uppercase;background:var(--acid);color:var(--bg);border:0;padding:16px 28px;cursor:pointer;width:100%;max-width:340px;box-shadow:0 0 24px rgba(230,255,61,.35)}
+.btn:disabled{opacity:.5;cursor:default}
+.ghost{font:500 12px var(--mono);letter-spacing:.1em;background:none;border:1px solid var(--line);color:var(--muted);padding:10px 14px;cursor:pointer}
+
+/* picker */
+.tables{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%}
+.tables button{font:800 26px var(--display);background:var(--panel);color:var(--ink);border:1px solid var(--line);padding:18px 0;cursor:pointer}
+.tables button span{display:block;font:500 10px var(--mono);letter-spacing:.14em;color:var(--muted);margin-bottom:4px}
+
+/* result */
+.biome{width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-top:4px solid var(--c);padding:16px 18px;display:flex;flex-direction:column;gap:6px}
+.biome h2{font-family:var(--display);font-size:26px;line-height:1.1;margin:0;color:var(--c)}
+.biome p{margin:0;color:var(--ink)}
+.biome code{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.roles{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.role{text-align:left;background:var(--panel);border:1px solid var(--neon);padding:14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.role h3{font-family:var(--display);font-size:16px;line-height:1.15;margin:0}
+.role p{margin:0;font-size:13px;color:var(--muted)}
+.role.solo{grid-column:1/-1;border-color:var(--acid)}
+.drop{animation:drop .45s ease-out both}
+.drop:nth-child(2){animation-delay:.12s}
+@keyframes drop{from{transform:translateY(12px) scale(.96);filter:brightness(2)}to{transform:none;filter:none}}
+
+.next{width:100%;text-align:left;border:1px dashed var(--line);padding:14px 16px}
+.next ol{margin:8px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.toast{font:700 12px var(--mono);letter-spacing:.16em;color:var(--acid)}
+.foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+@media (max-width:380px){h1{font-size:36px}.roles{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+
+<div class="wrap">
+  <header>
+    <div class="logo" aria-label="SIROHRAD">SIROHRAD<span aria-hidden="true">SIROHRAD</span></div>
+    <div class="mode" role="group" aria-label="Клас">
+      <button id="m89" type="button" aria-pressed="true">8–9 КЛАС</button>
+      <button id="m10" type="button" aria-pressed="false">10 КЛАС</button>
+    </div>
+  </header>
+
+  <div>
+    <div class="lab" style="display:flex;justify-content:space-between"><span>SYS://WORLD_LOAD</span><span class="n" id="lvl">LEVEL 01 / 05 · ВИБІР КЛАСУ</span></div>
+    <div class="bar" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+  </div>
+
+  <!-- picker -->
+  <section class="stage" id="pick">
+    <div class="lab g">ПОМИЛКА: СТІЛ НЕ ВИЗНАЧЕНО</div>
+    <h1>Обери свій стіл</h1>
+    <div class="tables" id="tables"></div>
+  </section>
+
+  <!-- crate -->
+  <section class="stage" id="open" hidden>
+    <div class="lab n" id="tlab">SYS://TABLE_01</div>
+    <h1 id="ttl">Стіл 01</h1>
+    <div class="crate" id="crate" aria-hidden="true"><div class="lid"></div><div class="box"><b>?</b></div></div>
+    <div class="reel" id="reel" aria-live="polite">Лутбокс вашої команди готовий</div>
+    <button class="btn" id="go" type="button">Відкрити лутбокс</button>
+    <button class="ghost" id="solo" type="button">Я сиджу сам за столом</button>
+  </section>
+
+  <!-- result -->
+  <section class="stage" id="res" hidden>
+    <div class="toast" id="toast">ACHIEVEMENT UNLOCKED · КЛАС ОТРИМАНО</div>
+    <div class="biome drop" id="biome"></div>
+    <div class="roles" id="roles"></div>
+    <div class="next">
+      <div class="lab n">ЩО ДАЛІ</div>
+      <ol>
+        <li>Впишіть біом і свої імена на дошку, у зону <b id="nextT">Стіл 01</b>.</li>
+        <li>Архітектор описує свій світ партнерові трьома словами. Вголос.</li>
+        <li>Чекайте сигналу ГРІДа: стартує Рівень 2.</li>
+      </ol>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span class="lab">SIROHRAD · BETA BUILD 0.9 · IT STEP</span>
+    <button class="ghost" id="reset" type="button" hidden>Скинути (для вчителя)</button>
+  </div>
+</div>
+
+<script>
+const BIOMES=[
+ {n:"Вулканічна кузня",d:"Лава, кузні, іскри, гаряче повітря.",k:"volcanic forge village, lava rivers, sparks",c:"#ff7a2f"},
+ {n:"Підводне місто",d:"Корали, скляні куполи, бульбашки.",k:"underwater city, coral towers, bubble domes",c:"#3d8bff"},
+ {n:"Печера кристалів",d:"Світні кристали, підземні ріки.",k:"glowing crystal cave, underground river",c:"#b98bff"},
+ {n:"Руїни в джунглях",d:"Древні храми, ліани, туман.",k:"ancient jungle ruins, vines, mist",c:"#41e07a"},
+ {n:"Хмарний острів",d:"Будиночки на хмарах, мости, вітер.",k:"floating cloud island, tiny houses, bridges",c:"#bfe3ff"},
+ {n:"Кібер-ринок",d:"Неонові вивіски, дрони, вузькі вулиці.",k:"cyber market street, neon signs, drones",c:"#ff5ad8"}
+];
+const ROLES={
+ "89":{a:["Архітектор світу","Створи локацію: місце, настрій, час доби."],h:["Творець героїв","Створи героя, який живе саме в цьому світі."],s:["Соло-режим: інді-розробник","Ти робиш і світ, і героя. Справжні інді-студії — це одна людина. Челендж для сильних."],lvl:"LEVEL 01 / 05 · ВИБІР КЛАСУ",go:"Відкрити лутбокс",t:"ACHIEVEMENT UNLOCKED · КЛАС ОТРИМАНО"},
+ "10":{a:["Environment Artist","Концепт локації: простір, атмосфера, світло. Задача від лід-дизайнера."],h:["Character Artist","Концепт персонажа для цієї локації. Задача від лід-дизайнера."],s:["Solo Dev · інді-розробник","Ти закриваєш обидві задачі: і локацію, і персонажа. Як справжня інді-студія."],lvl:"TASK 01 / 05 · РОЗПОДІЛ ЗАДАЧ",go:"Отримати задачі",t:"STATUS · IN PROGRESS"}
+};
+const $=id=>document.getElementById(id);
+let mode="89",table=null;
+const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+const key=()=>`sirohrad:${table}:${new Date().toDateString()}:${new Date().getHours()}`;
+// Biome rotates every hour but stays different for all six tables at the same moment
+const biomeFor=t=>BIOMES[(t-1+new Date().getHours())%6];
+
+function setMode(m){mode=m;$("m89").setAttribute("aria-pressed",m==="89");$("m10").setAttribute("aria-pressed",m==="10");
+  $("lvl").textContent=ROLES[m].lvl;$("go").textContent=ROLES[m].go;$("toast").textContent=ROLES[m].t;
+  store.set("sirohrad:mode",m);const r=table&&store.get(key());if(r)render(r);}
+$("m89").onclick=()=>setMode("89");$("m10").onclick=()=>setMode("10");
+
+for(let i=1;i<=6;i++){const b=document.createElement("button");b.type="button";b.innerHTML=`<span>СТІЛ</span>0${i}`;b.onclick=()=>{location.hash="t"+i};$("tables").appendChild(b)}
+
+function route(){
+  const m=/^#t([1-6])$/.exec(location.hash);
+  table=m?+m[1]:null;
+  $("pick").hidden=!!table;$("open").hidden=true;$("res").hidden=true;$("reset").hidden=!table;
+  if(!table)return;
+  $("tlab").textContent=`SYS://TABLE_0${table}`;$("ttl").textContent=`Стіл 0${table}`;$("nextT").textContent=`Стіл 0${table}`;
+  const saved=store.get(key());
+  if(saved){render(saved)}else{$("open").hidden=false;$("crate").className="crate";$("go").disabled=false;$("solo").disabled=false;$("reel").textContent="Лутбокс вашої команди готовий"}
+}
+window.addEventListener("hashchange",route);
+
+function roll(solo){
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const result={solo,left:Math.random()<.5?"a":"h"};
+  $("go").disabled=true;$("solo").disabled=true;$("crate").classList.add("shake");
+  let i=0;const steps=reduce?1:16;
+  const tick=()=>{ if(i<steps){$("reel").textContent=BIOMES[i%6].n;i++;setTimeout(tick,60+i*12)}
+    else{ $("crate").classList.remove("shake");$("crate").classList.add("open");$("reel").textContent="";
+      store.set(key(),result);setTimeout(()=>render(result),reduce?0:550)} };
+  tick();
+}
+$("go").onclick=()=>roll(false);$("solo").onclick=()=>roll(true);
+
+function render(r){
+  const b=biomeFor(table),R=ROLES[mode];
+  $("open").hidden=true;$("res").hidden=false;
+  $("biome").style.setProperty("--c",b.c);
+  $("biome").innerHTML=`<div class="lab">БІОМ КОМАНДИ</div><h2>${b.n}</h2><p>${b.d}</p><code>prompt: ${b.k}</code>`;
+  const card=(seat,role,cls="")=>`<div class="role drop ${cls}"><div class="lab n">${seat}</div><h3>${role[0]}</h3><p>${role[1]}</p></div>`;
+  if(r.solo){$("roles").innerHTML=card("ТИ",R.s,"solo")}
+  else{const L=r.left==="a"?R.a:R.h,P=r.left==="a"?R.h:R.a;$("roles").innerHTML=card("ГРАВЕЦЬ ЛІВОРУЧ",L)+card("ГРАВЕЦЬ ПРАВОРУЧ",P)}
+}
+$("reset").onclick=()=>{if(table){store.del(key());route()}};
+
+setMode(store.get("sirohrad:mode")||"89");
+route();
+</script>
+</body></html>
